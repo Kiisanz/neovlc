@@ -8,6 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 6.2 REQUIRED COMPONENTS Core Quick QuickControls2)
+find_package(Qt6 6.2 REQUIRED COMPONENTS Core Gui Quick QuickControls2)
 
 add_subdirectory(src)

@@ -2,6 +2,7 @@
 
 #include <vlc/VlcContext.h>
 #include <vlc/VlcMediaPlayer.h>
+#include <vlc/VlcVideoOutput.h>
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -16,9 +17,12 @@ int run(QGuiApplication &application)
     backend::VlcContext vlc;
     // Declared after the context and before the engine so it is destroyed first.
     backend::VlcMediaPlayer player(vlc);
+    // Renders into memory for the QML scene graph; torn down before the player.
+    backend::VlcVideoOutput video(player);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("vlcBackend"), &vlc);
     engine.rootContext()->setContextProperty(QStringLiteral("vlcPlayer"), &player);
+    engine.rootContext()->setContextProperty(QStringLiteral("vlcVideo"), &video);
     const QUrl mainUrl(QStringLiteral("qrc:/NeoVLC/Main.qml"));
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreated,

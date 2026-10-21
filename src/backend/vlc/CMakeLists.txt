@@ -6,6 +6,8 @@ add_library(neovlc_backend_vlc STATIC
     VlcContext.h
     VlcMediaPlayer.cpp
     VlcMediaPlayer.h
+    VlcVideoOutput.cpp
+    VlcVideoOutput.h
 )
 add_library(NeoVLC::Vlc ALIAS neovlc_backend_vlc)
 
@@ -13,6 +15,6 @@ target_include_directories(neovlc_backend_vlc
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/.."
 )
 target_link_libraries(neovlc_backend_vlc
-    PUBLIC Qt6::Core
+    PUBLIC Qt6::Core Qt6::Gui
     PRIVATE PkgConfig::LIBVLC
 )
