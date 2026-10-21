@@ -1,0 +1,20 @@
+# CMake and Qt build output
+/build*/
+/cmake-build-*/
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/compile_commands.json
+/.qt/
+
+# Local editor and environment files
+*.user
+*.user.*
+/.idea/
+/.vscode/
+/.agents/
+/.codex/
+/.aws/
+.env
+.env.*
+!.env.example
