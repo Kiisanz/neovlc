@@ -29,11 +29,11 @@ The project currently provides an application scaffold and initial libVLC integr
 | Architecture | Separate application, VLC backend, and QML UI modules |
 | Build configuration | CMake definitions for Qt 6 and libVLC via pkg-config |
 | libVLC dependency | Version 3.0.24, development headers, and runtime plugins detected in the setup environment |
-| Backend foundation | Instance ownership, version information, initialization status, and error reporting implemented in source |
-| QML integration | Backend exposed through the `vlcBackend` context property |
+| Backend foundation | Instance and media player ownership, lifecycle safeguards, version information, and error reporting |
+| QML integration | Backend and player exposed through the `vlcBackend` and `vlcPlayer` context properties |
 | Interface | Placeholder application window |
 | Playback and video rendering | Planned |
-| Verification | Static structure and file-reference checks completed; CMake configuration, compilation, and runtime behavior remain unverified |
+| Verification | CMake configuration and compilation verified in the setup environment; lifecycle smoke test passed; interactive playback untested |
 
 Development is exploratory and follows the roadmap below rather than a fixed release schedule. Linux is the initial development environment; other platforms have not been validated.
 
@@ -51,7 +51,7 @@ Checked items indicate source code or documentation already prepared. Build and 
 
 ### 2. Playback Backend
 
-- [ ] Implement media player ownership and lifecycle management.
+- [x] Implement media player ownership and lifecycle management.
 - [ ] Open local video files.
 - [ ] Add play, pause, stop, seek, and volume controls.
 - [ ] Expose playback state, position, duration, and errors to QML.
@@ -125,8 +125,10 @@ neovlc/
 │   │   └── Application.cpp     # Backend and QML lifecycle composition
 │   ├── backend/vlc/
 │   │   ├── CMakeLists.txt      # NeoVLC::Vlc library and libVLC discovery
-│   │   ├── VlcContext.h        # Backend interface
-│   │   └── VlcContext.cpp      # libVLC implementation
+│   │   ├── VlcContext.h        # libVLC instance ownership and player registry
+│   │   ├── VlcContext.cpp      # libVLC instance implementation
+│   │   ├── VlcMediaPlayer.h    # Media player ownership interface
+│   │   └── VlcMediaPlayer.cpp  # Media player lifecycle implementation
 │   └── ui/
 │       ├── Ui.cmake            # QML module and resource registration
 │       └── Main.qml            # Application window
@@ -136,7 +138,7 @@ neovlc/
 
 The application layer composes the backend and UI. The VLC backend is a separate static library, `NeoVLC::Vlc`, with no dependency on QML or Qt Quick. The UI is packaged in the executable as the `NeoVLC` QML module, with `qrc:/NeoVLC/Main.qml` as its entry point.
 
-QML can read `vlcBackend.available`, `vlcBackend.version`, and `vlcBackend.errorString`. Future C++ playback components can access the shared libVLC instance through `VlcContext::instance()` and must be destroyed before its owning context.
+QML can read `vlcBackend.available`, `vlcBackend.version`, `vlcBackend.errorString`, `vlcPlayer.available`, and `vlcPlayer.errorString`. The application creates the player after `VlcContext` and before the QML engine, so destruction runs engine first, then player, then the libVLC instance. `VlcContext` tracks live players, asserts the destruction order in debug builds, and warns in release builds if a player outlives the instance, detaching it so teardown cannot touch the destroyed context. Future C++ playback components can access the shared libVLC instance through `VlcContext::instance()` and must also be destroyed before its owning context.
 
 See [Architecture](docs/architecture.md) for module responsibilities and ownership rules.
 

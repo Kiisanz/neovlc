@@ -1,5 +1,8 @@
 #include "VlcContext.h"
 
+#include "VlcMediaPlayer.h"
+
+#include <utility>
 #include <vlc/vlc.h>
 
 namespace neovlc::backend {
@@ -15,11 +18,32 @@ VlcContext::VlcContext(QObject *parent)
     }
 }
 
-VlcContext::~VlcContext() = default;
+VlcContext::~VlcContext()
+{
+    Q_ASSERT_X(m_players.isEmpty(), "VlcContext::~VlcContext",
+               "Destroy all VlcMediaPlayer objects before their VlcContext.");
+    if (!m_players.isEmpty()) {
+        qWarning("VlcContext destroyed while %d media player(s) are still alive; "
+                 "destroy players before the context.",
+                 static_cast<int>(m_players.size()));
+        for (VlcMediaPlayer *player : std::as_const(m_players))
+            player->m_context = nullptr;
+    }
+}
 
 QString VlcContext::version() const
 {
     return QString::fromUtf8(libvlc_get_version());
+}
+
+void VlcContext::registerPlayer(VlcMediaPlayer *player)
+{
+    m_players.append(player);
+}
+
+void VlcContext::unregisterPlayer(VlcMediaPlayer *player)
+{
+    m_players.removeAll(player);
 }
 
 void VlcContext::InstanceDeleter::operator()(libvlc_instance_t *instance) const

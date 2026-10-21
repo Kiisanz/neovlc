@@ -19,9 +19,11 @@ setelah seluruh modul terpasang.
 memanggil `neovlc::app::run()`. `Application.cpp` mengelola masa hidup layanan,
 menyediakan backend ke QML, memuat jendela utama, dan menjalankan event loop.
 
-Instance backend dibuat sebelum engine QML dan dihancurkan setelah engine.
-Objek pemutar media yang ditambahkan kemudian harus dihancurkan sebelum
-instance libVLC yang dipakainya.
+`VlcContext` dan `VlcMediaPlayer` dibuat sebelum engine QML. Karena destruksi
+stack berjalan terbalik, engine QML dihancurkan lebih dulu, lalu pemutar, lalu
+instance libVLC, dan terakhir aplikasi. Keduanya diekspos ke QML sebagai
+context property `vlcBackend` dan `vlcPlayer`. Pemilik pemutar harus selalu
+menghancurkannya sebelum konteks.
 
 ## Backend VLC
 
@@ -34,6 +36,16 @@ dan konfigurasi pkg-config berada pada implementasi privat.
 inisialisasi, versi, pesan kesalahan, dan akses instance bagi implementasi
 pemutar C++. Backend tidak boleh mengimpor tipe dari `app` atau `ui`.
 
+`VlcMediaPlayer` memiliki satu `libvlc_media_player_t` melalui RAII dan
+menerima `VlcContext&` saat dibuat. Konstruktor mendaftarkan pemutar ke
+konteks hanya setelah pembuatan berhasil; destruktor menghentikan pemutaran
+lalu melepas referensinya. Konteks melacak pemutar yang masih hidup. Bila
+konteks dihancurkan lebih dulu, build debug menghentikan proses melalui
+`Q_ASSERT_X`; build release mencetak peringatan dan melepaskan kaitan pemutar
+agar pembongkaran tidak mengakses konteks yang sudah mati. Pola ini adalah
+jaring pengaman; urutan destruksi yang benar tetap tanggung jawab pemilik
+pemutar.
+
 Ketika playback ditambahkan, letakkan pengelola media, kontrol transport,
 dan penanganan event VLC di backend. Jangan memasukkan logika codec atau
 pemanggilan API VLC langsung ke file QML.
@@ -43,9 +55,10 @@ pemanggilan API VLC langsung ke file QML.
 `ui/Ui.cmake` mendaftarkan modul QML `NeoVLC` pada executable. Alias resource
 menjaga alamat entry point `qrc:/NeoVLC/Main.qml` tetap eksplisit.
 
-Kontrak yang tersedia saat ini adalah context property `vlcBackend`, dengan
-properti `available`, `version`, dan `errorString`. QML menangani presentasi
-dan interaksi pengguna; modul aplikasi memasok objek backend.
+Kontrak yang tersedia saat ini adalah context property `vlcBackend` dengan
+properti `available`, `version`, dan `errorString`, serta `vlcPlayer` dengan
+properti `available` dan `errorString`. QML menangani presentasi dan interaksi
+pengguna; modul aplikasi memasok objek backend.
 
 Tambahkan komponen UI dan resource saat dibutuhkan, lalu daftarkan secara
 eksplisit di `Ui.cmake`. Modul domain baru diberi target library sendiri
@@ -53,8 +66,13 @@ saat sudah mempunyai implementasi dan batas dependensi yang jelas.
 
 ## Status validasi
 
-Struktur, referensi file, dan alamat resource diperiksa tanpa menjalankan
-konfigurasi CMake, kompilasi, atau aplikasi. Integrasi runtime belum diuji.
+Konfigurasi CMake dan kompilasi berhasil diverifikasi di lingkungan setup. Uji
+asap siklus hidup memastikan pemutar dibuat dan dihancurkan dalam urutan yang
+benar tanpa peringatan. Jalur pelanggaran urutan juga diuji pada build dengan
+asertion nonaktif: konteks mencetak peringatan, melepaskan kaitan pemutar, dan
+pemutar dibongkar tanpa crash. Pada build debug, `Q_ASSERT_X` menghentikan
+proses sebelum fallback tersebut berjalan. Aplikasi berjalan sampai event loop
+dengan platform offscreen; interaksi UI dan pemutaran media belum diuji.
 
 Referensi mekanisme finalisasi:
 [Qt: qt_add_executable](https://doc.qt.io/qt-6/qt-add-executable.html).

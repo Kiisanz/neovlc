@@ -4,6 +4,8 @@ pkg_check_modules(LIBVLC REQUIRED IMPORTED_TARGET libvlc>=3.0)
 add_library(neovlc_backend_vlc STATIC
     VlcContext.cpp
     VlcContext.h
+    VlcMediaPlayer.cpp
+    VlcMediaPlayer.h
 )
 add_library(NeoVLC::Vlc ALIAS neovlc_backend_vlc)
 

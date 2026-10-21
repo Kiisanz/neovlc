@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QList>
 #include <QObject>
 #include <QString>
 #include <memory>
@@ -8,7 +9,9 @@ struct libvlc_instance_t;
 
 namespace neovlc::backend {
 
-// Owns the shared libVLC instance; future media players must be destroyed first.
+class VlcMediaPlayer;
+
+// Owns the shared libVLC instance; media players must be destroyed first.
 class VlcContext final : public QObject
 {
     Q_OBJECT
@@ -26,11 +29,17 @@ public:
     libvlc_instance_t *instance() const { return m_instance.get(); }
 
 private:
+    friend class VlcMediaPlayer;
+
     struct InstanceDeleter {
         void operator()(libvlc_instance_t *instance) const;
     };
 
+    void registerPlayer(VlcMediaPlayer *player);
+    void unregisterPlayer(VlcMediaPlayer *player);
+
     std::unique_ptr<libvlc_instance_t, InstanceDeleter> m_instance;
+    QList<VlcMediaPlayer *> m_players;
     QString m_errorString;
 };
 

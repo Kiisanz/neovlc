@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include <vlc/VlcContext.h>
+#include <vlc/VlcMediaPlayer.h>
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -13,8 +14,11 @@ int run(QGuiApplication &application)
 {
     // Keep libVLC alive until all objects owned by the QML engine are destroyed.
     backend::VlcContext vlc;
+    // Declared after the context and before the engine so it is destroyed first.
+    backend::VlcMediaPlayer player(vlc);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("vlcBackend"), &vlc);
+    engine.rootContext()->setContextProperty(QStringLiteral("vlcPlayer"), &player);
     const QUrl mainUrl(QStringLiteral("qrc:/NeoVLC/Main.qml"));
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreated,
