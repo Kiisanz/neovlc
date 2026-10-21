@@ -1,154 +1,156 @@
 # NeoVLC
 
-Proyek video player desktop menggunakan C++17, Qt Quick/QML, dan libVLC.
-NeoVLC dikembangkan bertahap dengan fokus pada antarmuka modern dan
-pengalaman pemutaran media yang sederhana.
+An experimental desktop media player built with **C++17**, **Qt Quick/QML**, and **libVLC**.
 
-Repository: [Kiisanz/neovlc](https://github.com/Kiisanz/neovlc)
+NeoVLC is a personal research and hobby project exploring modern media player interfaces, declarative UI development, and native playback integration. It is being developed in the open, with the aim of becoming an approachable open-source project for learning, experimentation, and collaboration.
 
-## Referensi desain
+[Repository](https://github.com/Kiisanz/neovlc) · [Architecture](docs/architecture.md) · [Roadmap](#roadmap)
 
-Arah desain proyek mengacu pada video
-["I Redesigned VLC After 25 Years"](https://www.youtube.com/watch?v=ERFeOgqk324)
-dari channel **Juxtopposed**. Video tersebut menjadi referensi visual dan
-pengalaman pengguna untuk pengembangan antarmuka NeoVLC.
+## Motivation and Design Reference
 
-Penerjemahan referensi ke komponen QML masuk dalam roadmap; tampilan saat
-ini masih berupa jendela placeholder.
+The project takes design inspiration from [“I Redesigned VLC After 25 Years”](https://www.youtube.com/watch?v=ERFeOgqk324) by **Juxtopposed**. The video serves as a reference for exploring how a contemporary interface can support familiar media playback workflows.
 
-## Status proyek
+The research focuses on three areas:
 
-**Tahap saat ini: fondasi awal / pra-MVP.** Belum tersedia video player
-yang dapat digunakan untuk memutar media.
+- Translating visual concepts into reusable QML components.
+- Integrating libVLC with Qt Quick while keeping playback logic separate from presentation.
+- Developing a modular C++ application with clear ownership and predictable resource lifetimes.
 
-| Area | Status |
+The current interface is a placeholder. Implementation of the design reference is planned as part of the UI milestone.
+
+## Project Status
+
+**Early development · Pre-MVP**
+
+The project currently provides an application scaffold and initial libVLC integration. Media playback is not implemented yet.
+
+| Area | Current state |
 | --- | --- |
-| Struktur modular | Tersedia: aplikasi, backend VLC, dan UI QML |
-| Konfigurasi CMake | Ditulis untuk Qt 6 dan libVLC melalui pkg-config |
-| Dependensi libVLC | Versi 3.0.24, header, dan plugin terdeteksi di lingkungan penyiapan |
-| Backend dasar | Pengelola instance, versi, status, dan pesan kesalahan tersedia di kode |
-| Penghubung QML | Context property `vlcBackend` tersedia di kode |
-| Antarmuka | Jendela placeholder; desain referensi belum diterapkan |
-| Playback dan rendering | Belum diimplementasikan |
-| Validasi | Pemeriksaan statis struktur dan referensi file selesai |
-| Konfigurasi, build, dan runtime | Belum dijalankan untuk struktur saat ini |
+| Architecture | Separate application, VLC backend, and QML UI modules |
+| Build configuration | CMake definitions for Qt 6 and libVLC via pkg-config |
+| libVLC dependency | Version 3.0.24, development headers, and runtime plugins detected in the setup environment |
+| Backend foundation | Instance ownership, version information, initialization status, and error reporting implemented in source |
+| QML integration | Backend exposed through the `vlcBackend` context property |
+| Interface | Placeholder application window |
+| Playback and video rendering | Planned |
+| Verification | Static structure and file-reference checks completed; CMake configuration, compilation, and runtime behavior remain unverified |
 
-Folder `build/` yang sudah ada berasal dari proyek sebelumnya dan diabaikan
-oleh Git. Isinya bukan hasil validasi implementasi saat ini.
+Development is exploratory and follows the roadmap below rather than a fixed release schedule. Linux is the initial development environment; other platforms have not been validated.
 
 ## Roadmap
 
-Urutan berikut menjadi panduan pengembangan. Item selesai menandai kode
-atau dokumentasi yang sudah disiapkan; validasi build dan runtime dicatat
-sebagai pekerjaan terpisah.
+Checked items indicate source code or documentation already prepared. Build and runtime verification are tracked separately.
 
-### 1. Fondasi proyek — disiapkan
+### 1. Project Foundation
 
-- [x] Menyiapkan kerangka Qt Quick/QML dan C++17.
-- [x] Memisahkan modul aplikasi, backend VLC, dan UI.
-- [x] Menghubungkan dependensi libVLC melalui CMake dan pkg-config.
-- [x] Menambahkan pengelola instance libVLC dan status backend untuk QML.
-- [x] Mendokumentasikan arsitektur dan referensi desain.
+- [x] Establish the C++17 and Qt Quick/QML application scaffold.
+- [x] Separate application composition, VLC integration, and UI modules.
+- [x] Define libVLC discovery and linking through CMake and pkg-config.
+- [x] Implement libVLC instance ownership and expose backend status to QML.
+- [x] Document module boundaries and the design reference.
 
-### 2. Backend pemutaran — berikutnya
+### 2. Playback Backend
 
-- [ ] Menambahkan pengelola media player dengan masa hidup yang terkontrol.
-- [ ] Membuka file video lokal.
-- [ ] Menyediakan play, pause, stop, seek, dan volume.
-- [ ] Menyinkronkan status, posisi, durasi, dan kesalahan ke QML.
-- [ ] Mengintegrasikan output video libVLC ke tampilan Qt Quick.
+- [ ] Implement media player ownership and lifecycle management.
+- [ ] Open local video files.
+- [ ] Add play, pause, stop, seek, and volume controls.
+- [ ] Expose playback state, position, duration, and errors to QML.
+- [ ] Integrate libVLC video output with Qt Quick.
 
-Target tahap: video lokal dapat tampil dan dikontrol melalui backend.
+**Milestone:** Local video can be rendered and controlled through the playback backend.
 
-### 3. Antarmuka MVP
+### 3. Player Interface
 
-- [ ] Menjabarkan referensi Juxtopposed menjadi layout dan komponen QML.
-- [ ] Menyiapkan warna, tipografi, jarak, dan ikon yang konsisten.
-- [ ] Membuat area video, pemilih file, dan kontrol pemutaran.
-- [ ] Menambahkan timeline, indikator waktu, dan kontrol volume.
-- [ ] Mendukung fullscreen, shortcut dasar, serta status kosong dan kesalahan.
+- [ ] Translate the design reference into QML layouts and reusable components.
+- [ ] Establish consistent colors, typography, spacing, and iconography.
+- [ ] Build the video surface, file selection flow, and transport controls.
+- [ ] Add a seek bar, time indicators, and volume controls.
+- [ ] Support fullscreen, essential keyboard shortcuts, and empty and error states.
 
-Target tahap: pengguna dapat membuka dan menonton video melalui UI.
+**Milestone:** A usable MVP for opening and watching local video files.
 
-### 4. Fitur media lanjutan
+### 4. Extended Media Features
 
-- [ ] Playlist dan antrean pemutaran.
-- [ ] Pemilihan subtitle dan track audio.
-- [ ] Pengaturan kecepatan pemutaran.
-- [ ] Riwayat media dan penyimpanan preferensi pengguna.
-- [ ] Membuka sumber media melalui URL.
+- [ ] Playlists and playback queues.
+- [ ] Subtitle and audio track selection.
+- [ ] Playback speed controls.
+- [ ] Recent media and persistent user preferences.
+- [ ] Network media sources.
 
-### 5. Validasi dan distribusi
+### 5. Validation and Distribution
 
-- [ ] Menjalankan konfigurasi CMake dan build setelah diizinkan.
-- [ ] Menguji playback, seek, audio, sinkronisasi UI, dan penutupan aplikasi.
-- [ ] Memverifikasi format media serta plugin VLC yang dibutuhkan.
-- [ ] Memvalidasi platform tambahan di luar lingkungan Linux penyiapan.
-- [ ] Menyiapkan pengujian otomatis untuk perilaku backend yang relevan.
-- [ ] Menyiapkan packaging, dependensi runtime, dan petunjuk menjalankan aplikasi.
+- [ ] Verify CMake configuration and compilation.
+- [ ] Test playback, seeking, audio output, UI synchronization, and application shutdown.
+- [ ] Check required media formats and VLC runtime plugins.
+- [ ] Evaluate additional target platforms.
+- [ ] Add focused automated tests for backend behavior.
+- [ ] Prepare packaging, runtime dependency handling, and setup instructions.
 
-Validasi dilakukan saat masing-masing fitur dikembangkan; tahap terakhir
-merangkum kesiapan distribusi. Platform rilis dan jadwal ditentukan setelah
-MVP terverifikasi.
+Verification will accompany feature development. The final milestone consolidates release readiness; distribution targets will be determined after the MVP is validated.
 
-## Prasyarat
+## Requirements
 
-- Qt 6.2 atau lebih baru dengan modul Quick dan Quick Controls 2
-- CMake 3.16 atau lebih baru
-- Compiler C++17
-- pkg-config dan libVLC 3.x (minimal 3.0), termasuk header pengembangan
-  dan plugin runtime VLC
+- A C++17 compiler
+- CMake 3.16 or later
+- Qt 6.2 or later with Core, Quick, and Quick Controls 2
+- pkg-config
+- libVLC 3.x, version 3.0 or later, including development headers and runtime plugins
 
-## Dependensi libVLC
+### libVLC Discovery
 
-Di lingkungan CachyOS saat penyiapan, `pkg-config` mendeteksi libVLC 3.0.24.
-CMake memakai target `PkgConfig::LIBVLC` untuk include dan linker flags.
-Dependensi ini wajib; konfigurasi CMake akan gagal jika libVLC tidak ditemukan.
+CMake uses the imported target `PkgConfig::LIBVLC` to obtain the required include paths and linker flags. libVLC is a required dependency.
 
-Untuk memeriksa instalasi tanpa build:
+Check the local installation without configuring or building the application:
 
 ```bash
 pkg-config --modversion libvlc
 pkg-config --cflags --libs libvlc
 ```
 
-Jika libVLC berada di prefix khusus, tambahkan direktori yang berisi
-`libvlc.pc` ke `PKG_CONFIG_PATH`. Saat aplikasi dijalankan, shared library
-dan plugin VLC juga harus tersedia. Konfigurasi saat ini menggunakan
-pkg-config dari instalasi sistem dan belum mencakup bundling distribusi.
+For a custom installation prefix, add the directory containing `libvlc.pc` to `PKG_CONFIG_PATH`. The VLC shared libraries and runtime plugins must also be available when the application runs. Runtime bundling is not implemented yet.
 
-## Struktur modular
+The setup environment is CachyOS Linux, where libVLC 3.0.24 was detected. Any existing `build/` directory contains artifacts from the earlier scaffold and does not validate the current implementation.
+
+## Project Structure
 
 ```text
 neovlc/
-├── CMakeLists.txt              # Versi proyek, standar C++, dependensi Qt
+├── CMakeLists.txt              # Project settings and Qt dependencies
 ├── src/
-│   ├── CMakeLists.txt          # Komposisi target aplikasi dan modul
+│   ├── CMakeLists.txt          # Application target composition
 │   ├── app/
-│   │   ├── Application.cmake   # Source dan dependensi executable
-│   │   ├── main.cpp            # Entry point dan metadata aplikasi
+│   │   ├── Application.cmake   # Application sources and dependencies
+│   │   ├── main.cpp            # Entry point and application metadata
 │   │   ├── Application.h
-│   │   └── Application.cpp     # Inisialisasi backend, QML, dan event loop
+│   │   └── Application.cpp     # Backend and QML lifecycle composition
 │   ├── backend/vlc/
-│   │   ├── CMakeLists.txt      # Library NeoVLC::Vlc dan dependensi libVLC
-│   │   ├── VlcContext.h        # Antarmuka backend
-│   │   └── VlcContext.cpp      # Implementasi libVLC
+│   │   ├── CMakeLists.txt      # NeoVLC::Vlc library and libVLC discovery
+│   │   ├── VlcContext.h        # Backend interface
+│   │   └── VlcContext.cpp      # libVLC implementation
 │   └── ui/
-│       ├── Ui.cmake            # Registrasi modul dan resource QML
-│       └── Main.qml            # Jendela utama
+│       ├── Ui.cmake            # QML module and resource registration
+│       └── Main.qml            # Application window
 └── docs/
-    └── architecture.md        # Batas modul dan aturan pengembangan
+    └── architecture.md        # Module boundaries and development guidance
 ```
 
-Backend dibangun sebagai library statis `NeoVLC::Vlc`. Modul aplikasi
-menghubungkannya dengan UI; backend tidak bergantung pada QML atau Qt Quick.
-UI dikemas di executable sebagai modul QML `NeoVLC`, dengan entry resource
-`qrc:/NeoVLC/Main.qml`. Detail ada di [arsitektur](docs/architecture.md).
+The application layer composes the backend and UI. The VLC backend is a separate static library, `NeoVLC::Vlc`, with no dependency on QML or Qt Quick. The UI is packaged in the executable as the `NeoVLC` QML module, with `qrc:/NeoVLC/Main.qml` as its entry point.
 
-QML dapat membaca `vlcBackend.available`, `vlcBackend.version`, dan
-`vlcBackend.errorString`. Backend membuat instance libVLC saat startup
-dan melepaskannya saat aplikasi ditutup. Instance tersedia untuk backend
-pemutar C++ melalui `VlcContext::instance()`; objek pemutar nantinya harus
-dihancurkan sebelum `VlcContext`.
+QML can read `vlcBackend.available`, `vlcBackend.version`, and `vlcBackend.errorString`. Future C++ playback components can access the shared libVLC instance through `VlcContext::instance()` and must be destroyed before its owning context.
 
-Referensi API: [VideoLAN LibVLC 3.0](https://videolan.videolan.me/vlc-3.0/group__libvlc__core.html).
+See [Architecture](docs/architecture.md) for module responsibilities and ownership rules.
+
+## Contributing
+
+Discussion, technical feedback, bug reports, and focused contributions are welcome. Useful areas of exploration include Qt Quick video rendering, libVLC lifecycle management, accessible player controls, and testing across platforms.
+
+For substantial changes, open an issue to discuss the approach first. Keep contributions scoped to a clear problem, respect the existing module boundaries, and describe any verification performed.
+
+## License
+
+Project licensing is pending; the repository does not yet include a `LICENSE` file.
+
+## References
+
+- [“I Redesigned VLC After 25 Years” — Juxtopposed](https://www.youtube.com/watch?v=ERFeOgqk324)
+- [VideoLAN libVLC 3.0 API](https://videolan.videolan.me/vlc-3.0/group__libvlc__core.html)
